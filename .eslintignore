@@ -5,6 +5,8 @@ test
 output
 build
 dist
+modules
+packages
 demo
 es
 lib

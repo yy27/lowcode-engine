@@ -120,56 +120,70 @@ export class SchemaParser implements ISchemaParser {
     const compDeps: Record<string, IExternalDependency> = {};
     const internalDeps: Record<string, IInternalDependency> = {};
     let utilsDeps: IExternalDependency[] = [];
-
+    // 2023-05-09 yanyan 支持多页面
+    let containers: IContainerInfo[] = [];
+    let DataSourceTypes: any = [];
     const schema = this.decodeSchema(schemaSrc);
-
-    // 解析三方组件依赖
-    schema.componentsMap.forEach((info: any) => {
-      if (info.componentName) {
-        compDeps[info.componentName] = {
-          ...info,
-          dependencyType: DependencyType.External,
-          componentName: info.componentName,
-          exportName: info.exportName ?? info.componentName,
-          version: info.version || '*',
-          destructuring: info.destructuring ?? false,
-        };
-      }
-    });
-
-    let containers: IContainerInfo[];
-    // Test if this is a lowcode component without container
-    if (schema.componentsTree.length > 0) {
-      const firstRoot: IPublicTypeContainerSchema = schema.componentsTree[0] as IPublicTypeContainerSchema;
-
-      if (!firstRoot.fileName && !isValidContainerType(firstRoot)) {
-        // 整个 schema 描述一个容器，且无根节点定义
-        const container: IContainerInfo = {
-          ...firstRoot,
-          ...defaultContainer,
-          props: firstRoot.props || defaultContainer.props,
-          css: firstRoot.css || defaultContainer.css,
-          moduleName: (firstRoot as IContainerInfo).moduleName || defaultContainer.moduleName,
-          children: schema.componentsTree as IPublicTypeNodeSchema[],
-        };
-        containers = [container];
-      } else {
-        // 普通带 1 到多个容器的 schema
-        containers = schema.componentsTree.map((n) => {
-          const subRoot = n as IPublicTypeContainerSchema;
-          const container: IContainerInfo = {
-            ...subRoot,
-            componentName: getRootComponentName(subRoot.componentName, compDeps),
-            containerType: subRoot.componentName,
-            moduleName: ensureValidClassName(changeCase.pascalCase(subRoot.fileName)),
-          };
-          return container;
-        });
-      }
-    } else {
-      throw new CodeGeneratorError("Can't find anything to generate.");
+    if ( !schema.pages){
+      schema.pages = [];
+      const formatterPage: any = {
+        componentsMap: schema.componentsMap,
+        componentsTree: schema.componentsTree,
+      };
+      schema.pages.push(formatterPage);
     }
+    for( let i = 0; i < schema.pages.length; i++) {
+      let nowPage: any = schema.pages[i];
+      let containerItem: any;
+      DataSourceTypes = DataSourceTypes.concat(this.collectDataSourcesTypes(nowPage));
+      // 解析三方组件依赖
+      nowPage.componentsMap.forEach((info: any) => {
+        if (info.componentName) {
+          compDeps[info.componentName] = {
+            ...info,
+            dependencyType: DependencyType.External,
+            componentName: info.componentName,
+            exportName: info.exportName ?? info.componentName,
+            version: info.version || '*',
+            destructuring: info.destructuring ?? false,
+          };
+        }
+      });
 
+      // let containers: IContainerInfo[];
+      // Test if this is a lowcode component without container
+      if (nowPage.componentsTree.length > 0) {
+        const firstRoot: IPublicTypeContainerSchema = nowPage.componentsTree[0] as IPublicTypeContainerSchema;
+
+        if (!firstRoot.fileName && !isValidContainerType(firstRoot)) {
+          // 整个 nowPage 描述一个容器，且无根节点定义
+          const container: IContainerInfo = {
+            ...firstRoot,
+            ...defaultContainer,
+            props: firstRoot.props || defaultContainer.props,
+            css: firstRoot.css || defaultContainer.css,
+            moduleName: (firstRoot as IContainerInfo).moduleName || defaultContainer.moduleName,
+            children: nowPage.componentsTree as IPublicTypeNodeSchema[],
+          };
+          containerItem = [container];
+        } else {
+          // 普通带 1 到多个容器的 nowPage
+          containerItem = nowPage.componentsTree.map((n: any) => {
+            const subRoot = n as IPublicTypeContainerSchema;
+            const container: IContainerInfo = {
+              ...subRoot,
+              componentName: getRootComponentName(subRoot.componentName, compDeps),
+              containerType: subRoot.componentName,
+              moduleName: ensureValidClassName(changeCase.pascalCase(subRoot.fileName)),
+            };
+            return container;
+          });
+        }
+      } else {
+        throw new CodeGeneratorError("Can't find anything to generate.");
+      }
+      containers = containers.concat(containerItem);
+    }
     // 分析引用能力的依赖
     containers = containers.map((con) => ({
       ...con,
@@ -319,7 +333,7 @@ export class SchemaParser implements ISchemaParser {
         containersDeps,
         utilsDeps,
         packages: npms || [],
-        dataSourcesTypes: this.collectDataSourcesTypes(schema),
+        dataSourcesTypes: DataSourceTypes,
         projectRemark: this.getProjectRemark(containers),
       },
     };
@@ -366,13 +380,13 @@ export class SchemaParser implements ISchemaParser {
     const defaultDataSourceType = 'fetch';
 
     // 收集应用级别的数据源
-    schema.dataSource?.list?.forEach((ds) => {
+    schema.dataSource?.list?.forEach((ds: any) => {
       dataSourcesTypes.add(ds.type || defaultDataSourceType);
     });
 
     // 收集容器级别的数据源（页面/组件/区块）
     schema.componentsTree.forEach((rootNode) => {
-      rootNode.dataSource?.list?.forEach((ds) => {
+      rootNode.dataSource?.list?.forEach((ds: any) => {
         dataSourcesTypes.add(ds.type || defaultDataSourceType);
       });
     });

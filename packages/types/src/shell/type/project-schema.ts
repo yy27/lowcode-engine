@@ -35,6 +35,8 @@ export interface IPublicTypeProjectSchema<T = IPublicTypeRootSchema> {
    * 是长度固定为 1 的数组，即数组内仅包含根容器的描述（低代码业务组件容器类型）
    */
   componentsTree: T[];
+  //2023-05-09 yanyan 多页面
+  pages: T[];
   /**
    * 国际化语料
    */
