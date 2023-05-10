@@ -174,6 +174,15 @@ export class ProjectBuilder implements IProjectBuilder {
         files,
       });
     }
+    // menu
+    if (parseResult.globalRouter && builders.router) {
+      const { files } = await builders.menu.generateModule(parseResult.globalRouter);
+
+      buildResult.push({
+        path: this.template.slots.menu.path,
+        files,
+      });
+    }
 
     // entry
     if (parseResult.project && builders.entry) {

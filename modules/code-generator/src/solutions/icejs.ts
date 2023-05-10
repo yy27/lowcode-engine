@@ -85,6 +85,7 @@ export default function createIceJsProjectBuilder(
         css(),
       ],
       router: [esmodule(), icejs.plugins.router()],
+      menu: [esmodule(), icejs.plugins.menu()],
       entry: [icejs.plugins.entry()],
       constants: [constants()],
       utils: [esmodule(), utils('react')],

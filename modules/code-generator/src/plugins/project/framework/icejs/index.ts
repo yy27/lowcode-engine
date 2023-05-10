@@ -4,6 +4,7 @@ import entryHtml from './plugins/entryHtml';
 import globalStyle from './plugins/globalStyle';
 import packageJSON from './plugins/packageJSON';
 import router from './plugins/router';
+import menu from './plugins/menu';
 
 export default {
   template,
@@ -13,5 +14,6 @@ export default {
     globalStyle,
     packageJSON,
     router,
+    menu,
   },
 };

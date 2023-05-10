@@ -14,6 +14,10 @@ const icejsTemplate: IProjectTemplate = {
       path: ['src'],
       fileName: 'routes',
     },
+    menu: {
+      path: ['src', 'layouts','BasicLayout'],
+      fileName: 'menuConfig',
+    },
     entry: {
       path: ['src'],
       fileName: 'app',

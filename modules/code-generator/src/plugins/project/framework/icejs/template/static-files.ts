@@ -19,7 +19,7 @@ import file18 from './files/src/layouts/BasicLayout/components/Logo/index.jsx';
 import file19 from './files/src/layouts/BasicLayout/components/Logo/index.style';
 import file20 from './files/src/layouts/BasicLayout/components/PageNav/index.jsx';
 import file14 from './files/src/layouts/BasicLayout/index.jsx';
-import file15 from './files/src/layouts/BasicLayout/menuConfig.js';
+// import file15 from './files/src/layouts/BasicLayout/menuConfig.js';
 import file3 from './files/stylelintignore';
 import file2 from './files/stylelintrc.js';
 import file1 from './files/tsconfig.json';
@@ -39,7 +39,7 @@ export function generateStaticFiles(root = createResultDir('.')): ResultDir {
   runFileGenerator(root, file12);
   runFileGenerator(root, file13);
   runFileGenerator(root, file14);
-  runFileGenerator(root, file15);
+  // runFileGenerator(root, file15);
   runFileGenerator(root, file16);
   runFileGenerator(root, file17);
   runFileGenerator(root, file18);

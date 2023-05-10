@@ -13,6 +13,7 @@ export const BUILTIN_SLOT_NAMES = [
   'pages',
   'components',
   'router',
+  'menu',
   'entry',
   'appConfig',
   'buildConfig',

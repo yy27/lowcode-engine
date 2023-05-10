@@ -130,6 +130,8 @@ export class SchemaParser implements ISchemaParser {
         componentsMap: schema.componentsMap,
         componentsTree: schema.componentsTree,
       };
+      delete schema.componentsMap;
+      delete schema.componentsTree
       schema.pages.push(formatterPage);
     }
     for( let i = 0; i < schema.pages.length; i++) {
